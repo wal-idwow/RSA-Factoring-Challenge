@@ -4,29 +4,52 @@ import math
 import sys
 import time
 
-def operation(nb):
-    if nb % 2 == 0:
-        i = 2
-        return "{}={}*{}".format(nb, int(nb // i), i)
-    else:
-        sq = int(math.sqrt(nb)) + 1
-        for i in range(3, sq, 2):
-            if nb % i == 0:
-                return "{}={}*{}".format(nb, int(nb // i), i)
-            if nb % (sq + i) == 0:
-                return "{}={}*{}".format(nb, sq + i, int(nb // (sq + i)))
-            if nb % (sq - i) == 0:
-                return "{}={}*{}".format(nb, sq - i, int(nb // (sq - i)))
+def factorize_number(number):
+    """Factorize a given number.
 
-def element(source):
-    with open(source, encoding="utf-8") as my_file:
-        for line in my_file:
-            n = int(line.strip())
-            result = operation(n)
-            print(result)
+    Args:
+        number (int): The number to be factorized.
+
+    Returns:
+        str: A string representation of the factorization result.
+    """
+    if number % 2 == 0:
+        divisor = 2
+        return "{}={}*{}".format(number, int(number // divisor), divisor)
+    else:
+        square_root = int(math.sqrt(number)) + 1
+        for divisor in range(3, square_root, 2):
+            if number % divisor == 0:
+                return "{}={}*{}".format(number, int(number // divisor), divisor)
+            if number % (square_root + divisor) == 0:
+                return "{}={}*{}".format(number, square_root + divisor, int(number // (square_root + divisor)))
+            if number % (square_root - divisor) == 0:
+                return "{}={}*{}".format(number, square_root - divisor, int(number // (square_root - divisor)))
+
+def process_file(file_path):
+    """Process a file containing integers and print their factorizations.
+
+    Args:
+        file_path (str): The path to the file containing integers.
+
+    Raises:
+        FileNotFoundError: If the specified file does not exist.
+    """
+    try:
+        with open(file_path, encoding="utf-8") as file:
+            for line in file:
+                number = int(line.strip())
+                result = factorize_number(number)
+                print(result)
+    except FileNotFoundError:
+        print(f"Error: File '{file_path}' not found.")
 
 if __name__ == "__main__":
+    if len(sys.argv) != 2:
+        print("Usage: python script.py <file_path>")
+        sys.exit(1)
+
     start_time = time.time()
-    element(sys.argv[1])
+    process_file(sys.argv[1])
     elapsed_time = time.time() - start_time
     print("\nElapsed Time: {:.3f}s".format(elapsed_time))

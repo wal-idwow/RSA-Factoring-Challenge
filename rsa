@@ -1,10 +1,17 @@
 #!/usr/bin/python3
 import sys
 import math
-import time
 import random
 
 def pollards_rho(n):
+    """Apply Pollard's Rho algorithm to find a non-trivial factor of n.
+
+    Args:
+        n (int): The number to be factorized.
+
+    Returns:
+        int: A non-trivial factor of n.
+    """
     if n % 2 == 0:
         return 2
     x = random.randint(1, n-1)
@@ -19,8 +26,15 @@ def pollards_rho(n):
     return d
 
 def factorize_rsa(num):
+    """Factorize a number using RSA algorithm.
+
+    Args:
+        num (int): The number to be factorized.
+
+    Returns:
+        list: A list of prime factors of the number.
+    """
     factors = []
-    original_num = num
 
     # Handle powers of 2 separately
     while num % 2 == 0:
@@ -39,12 +53,30 @@ def factorize_rsa(num):
     return factors
 
 def smallest_prime_factor(n):
+    """Find the smallest prime factor of a number.
+
+    Args:
+        n (int): The number to find the smallest prime factor.
+
+    Returns:
+        int: The smallest prime factor of n.
+    """
     for i in range(2, int(math.sqrt(n)) + 1):
         if n % i == 0:
             return i
     return n
 
 def print_factorization(num, factors):
+    """Generate a string representation of the factorization.
+
+    Args:
+        num (int): The original number.
+        factors (list): List of prime factors.
+
+    Returns:
+        str: A string representation of the factorization.
+    """
+    factors.sort(reverse = True)  # Ensure prime factors are sorted in ascending order
     factorization_str = "{}=".format(num)
     i = 0
     while i < len(factors):
@@ -61,6 +93,11 @@ def print_factorization(num, factors):
     return factorization_str.rstrip('*')
 
 def rsa_factorization(filename):
+    """Factorize numbers from a file using RSA algorithm.
+
+    Args:
+        filename (str): The path to the file containing integers.
+    """
     with open(filename, encoding="utf-8") as file:
         for line in file:
             num = int(line.strip())
@@ -69,10 +106,11 @@ def rsa_factorization(filename):
             print(result)
 
 if __name__ == "__main__":
-    start_time = time.time()
+    if len(sys.argv) != 2:
+        print("Usage: python script.py <file_path>")
+        sys.exit(1)
+    
     try:
         rsa_factorization(sys.argv[1])
     except KeyboardInterrupt:
         print("\nProcess interrupted.")
-    elapsed_time = time.time() - start_time
-    print("\nElapsed Time: {:.3f}s".format(elapsed_time))
