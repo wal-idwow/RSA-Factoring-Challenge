@@ -1,0 +1,78 @@
+#!/usr/bin/python3
+import sys
+import math
+import time
+import random
+
+def pollards_rho(n):
+    if n % 2 == 0:
+        return 2
+    x = random.randint(1, n-1)
+    y = x
+    c = random.randint(1, n-1)
+    d = 1
+    f = lambda x: (x**2 + c) % n
+    while d == 1:
+        x = f(x)
+        y = f(f(y))
+        d = math.gcd(abs(x-y), n)
+    return d
+
+def factorize_rsa(num):
+    factors = []
+    original_num = num
+
+    # Handle powers of 2 separately
+    while num % 2 == 0:
+        factors.append(2)
+        num //= 2
+    
+    # Factorize odd numbers
+    while num > 1:
+        if num > 10000:
+            factor = pollards_rho(num)
+        else:
+            factor = smallest_prime_factor(num)
+        factors.append(factor)
+        num //= factor
+    
+    return factors
+
+def smallest_prime_factor(n):
+    for i in range(2, int(math.sqrt(n)) + 1):
+        if n % i == 0:
+            return i
+    return n
+
+def print_factorization(num, factors):
+    factorization_str = "{}=".format(num)
+    i = 0
+    while i < len(factors):
+        count = 0
+        while i + count + 1 < len(factors) and factors[i] == factors[i + count + 1]:
+            count += 1
+        factorization_str += "{}".format(factors[i])
+        if count > 0:
+            factorization_str += "^{}".format(count + 1)
+            i += count
+        factorization_str += "*"
+        i += 1
+    
+    return factorization_str.rstrip('*')
+
+def rsa_factorization(filename):
+    with open(filename, encoding="utf-8") as file:
+        for line in file:
+            num = int(line.strip())
+            factors_list = factorize_rsa(num)
+            result = print_factorization(num, factors_list)
+            print(result)
+
+if __name__ == "__main__":
+    start_time = time.time()
+    try:
+        rsa_factorization(sys.argv[1])
+    except KeyboardInterrupt:
+        print("\nProcess interrupted.")
+    elapsed_time = time.time() - start_time
+    print("\nElapsed Time: {:.3f}s".format(elapsed_time))

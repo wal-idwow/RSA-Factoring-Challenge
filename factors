@@ -1,0 +1,32 @@
+#!/usr/bin/python3
+
+import math
+import sys
+import time
+
+def operation(nb):
+    if nb % 2 == 0:
+        i = 2
+        return "{}={}*{}".format(nb, int(nb // i), i)
+    else:
+        sq = int(math.sqrt(nb)) + 1
+        for i in range(3, sq, 2):
+            if nb % i == 0:
+                return "{}={}*{}".format(nb, int(nb // i), i)
+            if nb % (sq + i) == 0:
+                return "{}={}*{}".format(nb, sq + i, int(nb // (sq + i)))
+            if nb % (sq - i) == 0:
+                return "{}={}*{}".format(nb, sq - i, int(nb // (sq - i)))
+
+def element(source):
+    with open(source, encoding="utf-8") as my_file:
+        for line in my_file:
+            n = int(line.strip())
+            result = operation(n)
+            print(result)
+
+if __name__ == "__main__":
+    start_time = time.time()
+    element(sys.argv[1])
+    elapsed_time = time.time() - start_time
+    print("\nElapsed Time: {:.3f}s".format(elapsed_time))
