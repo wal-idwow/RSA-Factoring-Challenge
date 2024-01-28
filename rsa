@@ -1,38 +1,58 @@
 #!/usr/bin/python3
 from sys import argv
 
-def prime_factorization(number):
-    """Compute the prime factorization of an odd number.
+def division(n):
+    """perform trial division to find prime factors of a number.
+
     Args:
-        number (int): The odd number to factorize.
+        n (int): The number to be factorized.
+
     Returns:
-        str: The prime factorization as a string.
+        list: A list of prime factors of the input number.
     """
-    for factor_candidate in range(3, number, 2):
-        if number % factor_candidate == 0:
-            remaining_factor = number // factor_candidate
-            for prime_candidate in range(3, remaining_factor, 2):
-                if remaining_factor % prime_candidate == 0 or prime_candidate == 1:
-                    break
-            else:
-                return "{}*{}".format(remaining_factor, factor_candidate)
-    return None
+    factors = []
+
+    # Divide by 2
+    while n % 2 == 0:
+        factors.append(2)
+        n //= 2
+
+    # Divide by odd numbers starting from 3
+    for i in range(3, int(n**0.5) + 1, 2):
+        while n % i == 0:
+            factors.append(i)
+            n //= i
+
+    # If n is a prime number greater than 2
+    if n > 2:
+        factors.append(n)
+
+    return factors
+
+def prime_factorization(number):
+    """compute prime factorization of a number.
+    Args:
+        number (int): number to be factorized.
+    Returns:
+        str: string representing the prime factorization of the input number.
+    """
+    factors = division(number)
+    return '*'.join(map(str, factors))
 
 if len(argv) != 2:
     print("Usage: python script.py input_file.txt")
     exit(1)
 
 with open(argv[1]) as file:
+    """factorize numbers from a file and print the results.
+    Args:
+        file_path (str): The path to file containing natural numbers to factor.
+    """
     for line in file:
         number = int(line)
-
         print("{:d}=".format(number), end="")
-
         if number % 2 == 0:
             print("{}*2".format(number // 2))
-            continue
-
-        result = prime_factorization(number)
-        if result is not None:
+        else:
+            result = prime_factorization(number)
             print(result)
-
