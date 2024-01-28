@@ -1,0 +1,90 @@
+#!/usr/bin/python3
+"""A script for factorizing natural numbers from a file.
+
+Returns:
+    None
+"""
+
+import sys
+import math
+
+def factorize_number(number):
+    """Factorize a single natural number into a product of two smaller numbers.
+
+    Args:
+        number (int): The natural number to factorize.
+
+    Returns:
+        str: A string representing the factorization result.
+    """
+    if number % 2 == 0:
+        return "{}={}*{}".format(number, number // 2, 2)
+
+    def pollard_rho(n):
+        # Pollard's rho algorithm for factorization
+        x = 2
+        y = 2
+        d = 1
+        f = lambda x: (x**2 + 1) % n
+        while d == 1:
+            x = f(x)
+            y = f(f(y))
+            d = math.gcd(abs(x - y), n)
+        return d
+
+    # Use Pollard's rho to find a non-trivial factor
+    factor = pollard_rho(number)
+
+    if factor == number:
+        # If Pollard's rho failed to find a factor, the number is prime
+        return "{}={}*{}".format(number, number, 1)
+    else:
+        # Return the factorization
+        return "{}={}*{}".format(number, number // factor, factor)
+
+
+def process_chunk(chunk):
+    """Process a chunk of numbers and return the factorization results.
+
+    Args:
+        chunk (list): A list of natural numbers to be factorized.
+
+    Returns:
+        list: A list of strings representing the factorization results.
+    """
+    results = []
+    for number in chunk:
+        result = factorize_number(number)
+        results.append(result)
+    return results
+
+
+def factorize_file(file_path, chunk_size=1000):
+    """Factorize numbers from a file and print the results.
+
+    Args:
+        file_path (str): The path to the file containing natural numbers to factor.
+        chunk_size (int, optional): The size of each processing chunk. Defaults to 1000.
+    """
+    try:
+        with open(file_path) as file:
+            for line in file:
+                number = int(line)
+                result = factorize_number(number)
+                print(result)
+    except FileNotFoundError:
+        print(f"Error: File '{file_path}' not found.")
+    except ValueError:
+        print(f"Error: Invalid number in the file.")
+
+if __name__ == "__main__":
+    # Check if the correct number of command-line arguments is provided
+    if len(sys.argv) != 2:
+        print("Usage: python script.py input_file.txt")
+        exit(1)
+
+    # Measure the time taken to factorize and print the results
+    import time
+    start_time = time.time()
+    factorize_file(sys.argv[1])
+    end_time = time.time()
