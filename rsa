@@ -1,68 +1,49 @@
 #!/usr/bin/python3
 from sys import argv
-import math
 
-def factorization(nombre):
-    """
-    Performs the factorization of a number and prints the result.
+def prime_factorization(number):
+    """Compute the prime factorization of an odd number.
 
     Args:
-        nombre (int): The number to factorize.
-    """
-    if nombre % 2 == 0:
-        i = 2
-        print("{}={}*{}".format(nombre, int(nombre/i), i))
-    else:
-        x = math.sqrt(nombre)
-        if x % 1 == 0:
-            print("{}={}*{}".format(nombre, int(x), int(nombre/x)))
-            return
-        x = int(x) + 1
-        for i in range(3, x, +2):
-            if nombre % i == 0:
-                if prime_check(i):
-                    print("{}={}*{}".format(nombre, int(nombre/i), i))
-                    return
-
-def numbers(source):
-    """
-    Reads numbers from a file and performs factorization for each number.
-
-    Args:
-        source (str): The name of the file containing numbers.
-    """
-    with open(source, encoding="utf-8") as file:
-        for nbr in file.readlines():
-            i = int(nbr)
-            factorization(i)
-
-def prime_check(nombre):
-    """
-    Checks if a number is prime.
-
-    Args:
-        nombre (int): The number to check.
+        number (int): The odd number to factorize.
 
     Returns:
-        bool: True if the number is prime, False otherwise.
+        str: The prime factorization as a string.
     """
-    n = 3
-    if nombre % 2 == 0:
-        return False
-    while n * n <= nombre:
-        if nombre % n == 0:
-            return False
-        n += 2
-    return True
+    for factor_candidate in range(3, number, 2):
+        # Check if factor_candidate is a factor of number
+        if number % factor_candidate == 0:
+            remaining_factor = number // factor_candidate
+            # Check for prime factors of the remaining factor
+            for prime_candidate in range(3, remaining_factor, 2):
+                if remaining_factor % prime_candidate == 0 or prime_candidate == 1:
+                    break
+            else:
+                # return prime factorization
+                return "{}*{}".format(remaining_factor, factor_candidate)
+    return None
 
+# check if the correct number of command-line arguments is provided
+if len(argv) != 2:
+    print("Usage: python script.py input_file.txt")
+    exit(1)
 
-if __name__ == "__main__":
-    """
-    Main entry point. Reads the input source from the command nbr
-    and performs factorization for each number in the file.
-    """
-    if len(argv) != 2:
-        print("Usage: {} <filename>".format(argv[0]))
-        exit(1)
+# open the specified file for reading
+with open(argv[1]) as file:
+    # iterate through each line in the file
+    for line in file:
+        # convert the line to an integer
+        number = int(line)
 
-    numbers(argv[1])
+        # output the original number with an equal sign
+        print("{:d}=".format(number), end="")
+
+        # check if the number is even
+        if number % 2 == 0:
+            print("{}*2".format(number // 2))
+            continue
+
+        # factorize odd numbers using the prime_factorization function
+        result = prime_factorization(number)
+        if result is not None:
+            print(result)
